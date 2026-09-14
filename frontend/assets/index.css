@@ -1,0 +1,78 @@
+@import './global.css';
+
+/* Users List */
+
+.users-list {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.users-list__item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 1rem;
+    border-top: 1px solid #6c757d;
+}
+
+@media (max-width: 596px) {
+    .users-list__item {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .item__right .btn {
+        margin-top: .5rem;
+    }
+}
+
+.users-list__item:last-child {
+    border-bottom: 1px solid #6c757d;
+}
+
+.item__left span {
+    display: block;
+}
+
+.item__right .btn:first-child {
+    margin-right: .5rem;
+}
+
+/* Modal Section */
+.overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    z-index: 10;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(0, 0, 0, .5);
+}
+
+.modal-container {
+    width: 300px;
+    height: 300px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-around;
+    text-align: center;
+    background-color: whitesmoke;
+}
+
+.modal-container .buttons {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    width: 100%;
+}
+
+.modal-container .buttons .btn {
+    width: 40%;
+}
