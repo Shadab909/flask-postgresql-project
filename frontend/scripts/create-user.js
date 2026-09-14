@@ -6,8 +6,6 @@ const city = document.getElementById('city');
 const state = document.getElementById('state');
 const btnCreate = document.getElementById('btnCreate');
 
-const API_BASE_URL = 'http://localhost:5000/api/v1';
-
 btnCreate.addEventListener('click', async e => {
     e.preventDefault();
     const fields = [completeName, age, street, number, city, state];

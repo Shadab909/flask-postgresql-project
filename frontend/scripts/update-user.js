@@ -1,5 +1,3 @@
-const API_BASE_URL = 'http://localhost:5000/api/v1';
-
 window.onload = () => loadUser();
 
 const completeName = document.getElementById('name');
