@@ -1,3 +1,5 @@
+const API_BASE_URL = 'http://localhost:5000/api/v1';
+
 window.onload = () => loadUser();
 
 const completeName = document.getElementById('name');
@@ -10,24 +12,36 @@ const btnUpdate = document.getElementById('btnUpdate');
 
 async function fetchUser() {
     const id = getQueryParameter('id');
-    const response = await fetch(`http://localhost:5000/api/v1/users/${id}`, {
-        method: 'GET',
-        headers: new Headers({
-            'Content-Type': 'application/json'
-        })
-    });
-    const data = await response.json();
-    return data;
+    try {
+        const response = await fetch(`${API_BASE_URL}/users/${id}`, {
+            method: 'GET',
+            headers: new Headers({
+                'Content-Type': 'application/json'
+            })
+        });
+        if (!response.ok) return null;
+        const data = await response.json();
+        return data;
+    } catch (err) {
+        console.error('Error fetching user:', err);
+        return null;
+    }
 }
 
 async function loadUser() {
     const user = await fetchUser();
-    completeName.value = user.name;
-    age.value = user.age;
-    street.value = user.address.street;
-    number.value = user.address.number;
-    city.value = user.address.city;
-    state.value = user.address.state;
+    if (!user) {
+        alert('Could not load user data.');
+        return;
+    }
+    completeName.value = user.name || '';
+    age.value = user.age || '';
+    if (user.address) {
+        street.value = user.address.street || '';
+        number.value = user.address.number || '';
+        city.value = user.address.city || '';
+        state.value = user.address.state || '';
+    }
 }
 
 function getQueryParameter(variable) {
@@ -46,7 +60,10 @@ btnUpdate.addEventListener('click', async e => {
     e.preventDefault();
     const fields = [completeName, age, street, number, city, state];
     for (let index = 0; index < fields.length; index++) {
-        if (!fields[index].value) return;
+        if (!fields[index].value) {
+            alert('Please fill in all fields.');
+            return;
+        }
     }
 
     const body = {
@@ -60,18 +77,22 @@ btnUpdate.addEventListener('click', async e => {
         }
     };
 
-    const response = await updateUser(body);
-    if (response.status === 204) {
-        alert('Usuário atualizado!');
-        loadUser();
-    } else {
-        alert(response.statusText);
+    try {
+        const response = await updateUser(body);
+        if (response.status === 204 || response.status === 200) {
+            alert('User updated successfully!');
+            window.location.href = 'index.html';
+        } else {
+            alert('Failed to update user: ' + response.statusText);
+        }
+    } catch (err) {
+        alert('Error connecting to server: ' + err.message);
     }
 });
 
 async function updateUser(body) {
     const id = getQueryParameter('id');
-    const response = await fetch(`http://localhost:5000/api/v1/users/${id}`, {
+    const response = await fetch(`${API_BASE_URL}/users/${id}`, {
         method: 'PUT',
         headers: new Headers({
             'Content-Type': 'application/json'
