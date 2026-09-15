@@ -1,6 +1,7 @@
 ---
 - name: Check posgresql status
   command: systemctl is-active postgresql 
+  ignore_errors: true
   register: postgresql_status
 
 
