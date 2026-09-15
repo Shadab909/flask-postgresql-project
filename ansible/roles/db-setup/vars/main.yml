@@ -1,0 +1,4 @@
+dependencies:
+  - name: postgresql-server
+  - name: postgresql
+  - name: firewalld

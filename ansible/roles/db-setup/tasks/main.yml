@@ -1,0 +1,71 @@
+---
+- name: Check posgresql status
+  command: systemctl is-active postgresql 
+  register: postgresql_status
+
+
+- debug:
+    msg: "postgresql not installed. posgresql status : {{ postgresql_status }}"
+  when: postgresql_status.rc != 0
+
+
+- name: Stop role execution if postgres is running
+  meta: end_play
+  when: postgresql_status.rc == 0
+
+
+- name: Install dependencies
+  package:
+    name: "{{ item.name }}"
+    state: present
+  loop: "{{ dependencies }}"
+
+
+- name: Initialize database
+  command: postgresql-setup --initdb
+  register: init_db_status
+
+
+- name: Print db initialization status
+  debug: 
+    msg: "db initialization : {{ init_db }}"
+
+
+- name: Fail if db not initialized
+  fail:
+    msg: "DB not initialized successfully"
+  when: init_db.rc != 0
+
+
+- name: Start and enable database
+  service:
+    name: postgresql
+    state: started
+    enabled: true
+
+
+- name: Check db initialized 
+  command: systemctl is-active postgresql 
+  register: db_active_status
+
+
+- name: Fail if db not active
+  fail:
+    msg: "Db not active"
+  when: db_active_status.rc != 0
+
+
+- name: Check db enabled 
+  command: systemctl is-enabled postgresql 
+  register: db_enable_status
+
+
+- name: Fail if db not enabled
+  fail:
+    msg: "Db not enabled"
+  when: db_enable_status.rc != 0
+
+
+
+
+

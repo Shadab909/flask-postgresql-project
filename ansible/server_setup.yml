@@ -1,0 +1,7 @@
+---
+- name: DB setup
+  hosts: db
+  become: true
+
+  roles:
+    - db-setup
