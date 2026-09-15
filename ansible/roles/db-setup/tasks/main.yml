@@ -37,7 +37,7 @@
 - name: Fail if db not initialized
   fail:
     msg: "DB not initialized successfully"
-  when: init_db.rc != 0
+  when: init_db_status.rc != 0
 
 
 - name: Start and enable database
