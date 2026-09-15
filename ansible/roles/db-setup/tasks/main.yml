@@ -24,12 +24,14 @@
 
 - name: Initialize database
   command: postgresql-setup --initdb
+  args:
+    creates: /var/lib/pgsql/data/PG_VERSION
   register: init_db_status
 
 
 - name: Print db initialization status
   debug: 
-    msg: "db initialization : {{ init_db }}"
+    msg: "db initialization : {{ init_db_status }}"
 
 
 - name: Fail if db not initialized
