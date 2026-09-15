@@ -1,7 +1,8 @@
 ---
 - name: DB setup
   hosts: db
-  become: true
+  become: true          # already set in inventory, but explicit is fine
+  gather_facts: false    # default is true, can omit
 
   roles:
     - db-setup

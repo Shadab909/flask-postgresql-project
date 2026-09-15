@@ -1,11 +1,18 @@
 [db]
-192.168.56.13
+db01 ansible_host=192.168.56.13 ansible_password="{{ db01_ssh_password }}" ansible_become_password="{{ db01_ssh_password }}"
 
 
 [lb]
-192.168.56.14
+lb01 ansible_host=192.168.56.14 ansible_password="{{ lb01_ssh_password }}" ansible_become_password="{{ lb01_ssh_password }}"
 
 
 [app]
-192.168.56.11
-192.168.56.12
+app01 ansible_host=192.168.56.11 ansible_password="{{ app01_ssh_password }}" ansible_become_password="{{ app01_ssh_password }}"
+app02 ansible_host=192.168.56.12 ansible_password="{{ app02_ssh_password }}" ansible_become_password="{{ app02_ssh_password }}"
+
+
+[all:vars]
+ansible_connection=ssh
+ansible_user=ansible
+ansible_become=true
+ansible_ssh_common_args='-o StrictHostKeyChecking=no'
