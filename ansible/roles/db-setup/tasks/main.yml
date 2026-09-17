@@ -49,6 +49,7 @@
 
 - name: Check db initialized 
   command: systemctl is-active postgresql 
+  ignore_errors: true
   register: db_active_status
 
 
@@ -60,6 +61,7 @@
 
 - name: Check db enabled 
   command: systemctl is-enabled postgresql 
+  ignore_errors: true
   register: db_enable_status
 
 
@@ -67,6 +69,56 @@
   fail:
     msg: "Db not enabled"
   when: db_enable_status.rc != 0
+
+
+- name: Create database user
+  become_user: postgres 
+  command: createuser "{{ db_user_name }}"
+  register: db_username_status
+  failed_when: db_username_status.rc != 0 and 'result exists' not in db_username_status.stderr
+  changed_when: db_username_status.rc == 0
+
+- name: Check if database user exists 
+  become_user: postgres
+  command: psql -tAc "SELECT 1 FROM pg_roles WHERE rolname='{{ db_user_name }}'"
+  register: db_user_validation_status
+  changed_when: false
+
+- name: Assert user exists
+  assert:
+    that: "'1' in db_user_validation_status.stdout"
+    fail_msg: "User {{ db_user_name }} was not created"
+    success_msg: "User {{ db_user_name }} creation confirmed"
+  
+
+- name: Set password for database user 
+  become_user: postgres 
+  command: psql -c "ALTER USER {{ db_user_name }} WITH PASSWORD '{{ db_user_pw }}';"
+  register: db_userpw_status
+  failed_when: db_userpw_status.rc != 0
+  changed_when: db_userpw_status.rc == 0
+
+
+- name: Create database 
+  become_user: postgres
+  command: createdb -O "{{ db_user_name }}" "{{ db_name }}"
+  register: db_status 
+  failed_when: db_status.rc != 0 and 'already exists' not in db_status.stderr 
+  changed_when: db_status.rc == 0
+
+
+- name: Check if database exits 
+  become_user: postgres
+  command: psql -tAc "SELECT 1 FROM pg_database WHERE datname='{{ db_name }}'"
+  register: db_validation_status
+  changed_when: false 
+
+- name: Assert databse exists 
+  assert:
+    that: "'1' in db_validation_status.stdout"
+    fail_msg: "Database {{ db_name }} was not created"
+    success_msg: "Database {{ db_name }} creation confirmed"
+
 
 
 
