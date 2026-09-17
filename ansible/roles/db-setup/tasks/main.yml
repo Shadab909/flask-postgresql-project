@@ -1,20 +1,4 @@
 ---
-# - name: Check posgresql status
-#   command: systemctl is-active postgresql 
-#   ignore_errors: true
-#   register: postgresql_status
-
-
-# - debug:
-#     msg: "postgresql not installed. posgresql status : {{ postgresql_status }}"
-#   when: postgresql_status.rc != 0
-
-
-# - name: Stop role execution if postgres is running
-#   meta: end_play
-#   when: postgresql_status.rc == 0
-
-
 - name: Install dependencies
   package:
     name: "{{ item.name }}"
@@ -51,6 +35,7 @@
   command: systemctl is-active postgresql 
   ignore_errors: true
   register: db_active_status
+  changed_when: false
 
 
 - name: Fail if db not active
@@ -63,6 +48,7 @@
   command: systemctl is-enabled postgresql 
   ignore_errors: true
   register: db_enable_status
+  changed_when: false
 
 
 - name: Fail if db not enabled
