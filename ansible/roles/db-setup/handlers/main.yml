@@ -6,5 +6,5 @@
 
 - name: reload postgresql
   systemd:
-    name: posgresql
+    name: postgresql
     state: reloaded

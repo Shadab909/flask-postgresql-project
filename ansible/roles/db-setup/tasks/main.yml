@@ -157,6 +157,10 @@
   changed_when: db_userpw_encypted_status.rc == 0
   notify: reload postgresql
 
+
+- name: Flush handlers to apply encryption setting immediately
+  meta: flush_handlers
+
 - name: Reset password for database user 
   become_user: postgres 
   command: psql -c "ALTER USER {{ db_user_name }} WITH PASSWORD '{{ db_user_pw }}';"
