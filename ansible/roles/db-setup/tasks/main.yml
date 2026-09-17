@@ -147,8 +147,15 @@
     block: |
       host    infomarket    infomarket    {{ app01_node_ip }}/32    scram-sha-256
       host    infomarket    infomarket    {{ app02_node_ip }}/32    scram-sha-256
-  notify: reload postgresql
 
+
+- name: Update password encryption type to SCRAM
+  become_user: postgres
+  command: psql -c "ALTER SYSTEM SET password_encryption = 'scram-sha-256';"
+  register: db_userpw_encypted_status
+  failed_when: db_userpw_encypted_status.rc != 0
+  changed_when: db_userpw_encypted_status.rc == 0
+  notify: reload postgresql
 
 - name: Reset password for database user 
   become_user: postgres 
