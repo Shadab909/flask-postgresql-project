@@ -120,6 +120,60 @@
     success_msg: "Database {{ db_name }} creation confirmed"
 
 
+- name: Update listen_addresses
+  lineinfile:
+    path: /var/lib/pgsql/data/postgresql.conf
+    regexp: "^#?listen_addresses\\s*="
+    line: "listen_addresses = '{{ db_node_ip }}'          # what IP address(es) to listen on;"
+  notify: restart postgresql
+
+- name: Check if listen_addresses Update
+  command: grep "listen_addresses = '{{ db_node_ip }}'" /var/lib/pgsql/data/postgresql.conf
+  register: listen_addresses_validation_status
+  changed_when: false 
+
+
+- name: Assert listen_addresses updated
+  assert:
+    that: "listen_addresses_validation_status.rc == 0"
+    fail_msg: "listen_addresses not updated to {{ db_node_ip }}"
+    success_msg: "listen_addresses updated to {{ db_node_ip }} confirmed"
+
+ 
+- name: Add pg_hpa entries for app servers
+  blockinfile:
+    path: /var/lib/pgsql/data/pg_hba.conf
+    marker: "# {mark} ANSIBLE MANAGED BLOCK - For {{ db_name }} db access to app servers"
+    block: |
+      host    infomarket    infomarket    {{ app01_node_ip }}/32    scram-sha-256
+      host    infomarket    infomarket    {{ app02_node_ip }}/32    scram-sha-256
+  notify: reload postgresql
+
+
+- name: Reset password for database user 
+  become_user: postgres 
+  command: psql -c "ALTER USER {{ db_user_name }} WITH PASSWORD '{{ db_user_pw }}';"
+  register: db_userpw_status
+  failed_when: db_userpw_status.rc != 0
+  changed_when: db_userpw_status.rc == 0
+
+
+- name: Check password encryption type for database user 
+  become_user: postgres
+  command: psql -tAc "SELECT LEFT(rolpassword, 4) FROM pg_authid WHERE rolname='{{ db_user_name }}';"
+  register: password_type_check
+  changed_when: false
+
+- name:  Assert password encryption is SCRAM 
+  assert:
+    that: "password_type_check.stdout.strip() == 'SCRA'"
+    fail_msg: "Password for {{ db_user_name }} is not SCRAM-encrypted (got: {{ password_type_check.stdout }})"
+    success_msg: "Password for {{ db_user_name }} confirmed SCRAM-encrypted"
+
+
+
+
+
 
 
 
