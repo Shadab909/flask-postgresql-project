@@ -4,5 +4,8 @@
   become: true          # already set in inventory, but explicit is fine
   gather_facts: false    # default is true, can omit
 
+  vars_files:
+    - vars_files/secrets.yml
+    
   roles:
     - db-setup
