@@ -1,18 +1,18 @@
 ---
-- name: Check posgresql status
-  command: systemctl is-active postgresql 
-  ignore_errors: true
-  register: postgresql_status
+# - name: Check posgresql status
+#   command: systemctl is-active postgresql 
+#   ignore_errors: true
+#   register: postgresql_status
 
 
-- debug:
-    msg: "postgresql not installed. posgresql status : {{ postgresql_status }}"
-  when: postgresql_status.rc != 0
+# - debug:
+#     msg: "postgresql not installed. posgresql status : {{ postgresql_status }}"
+#   when: postgresql_status.rc != 0
 
 
-- name: Stop role execution if postgres is running
-  meta: end_play
-  when: postgresql_status.rc == 0
+# - name: Stop role execution if postgres is running
+#   meta: end_play
+#   when: postgresql_status.rc == 0
 
 
 - name: Install dependencies
@@ -75,7 +75,7 @@
   become_user: postgres 
   command: createuser "{{ db_user_name }}"
   register: db_username_status
-  failed_when: db_username_status.rc != 0 and 'result exists' not in db_username_status.stderr
+  failed_when: db_username_status.rc != 0 and 'already exists' not in db_username_status.stderr
   changed_when: db_username_status.rc == 0
 
 - name: Check if database user exists 
