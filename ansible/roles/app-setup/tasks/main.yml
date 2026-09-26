@@ -76,8 +76,6 @@
     echo $!
   args:
     chdir: /home/vagrant/flask-postgresql-project/
-  environment:
-    PATH: "/root/.local/bin:{{ ansible_env.PATH }}"
   register: backend_status
 
 
