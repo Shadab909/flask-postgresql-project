@@ -1,5 +1,9 @@
 ---
 
+- name: Show effective connection user
+  debug:
+    msg: "Connecting as: {{ ansible_user }}"
+
 - name: Install dependencies
   package:
     name: "{{ item.name }}"
