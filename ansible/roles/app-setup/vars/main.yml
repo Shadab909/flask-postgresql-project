@@ -1,0 +1,8 @@
+dependencies:
+  - name: git 
+  - name: gcc 
+  - name: python3-devel 
+  - name: postgresql-devel 
+  - name: postgresql
+
+git_repo_url: 'https://github.com/Shadab909/flask-postgresql-project.git'

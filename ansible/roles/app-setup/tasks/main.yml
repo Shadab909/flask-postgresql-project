@@ -1,0 +1,103 @@
+---
+
+- name: Install dependencies
+  package:
+    name: "{{ item.name }}"
+    state: present
+  loop: "{{ dependencies }}"
+
+
+- name: Clone git repo
+  git: 
+    repo: "{{ git_repo_url }}"
+    dest: /home/vagrant/flask-postgresql-project
+
+
+- name: Check if git repo cloned 
+  stat:
+    path: /home/vagrant/flask-postgresql-project
+  register: git_repo_status
+
+
+- name: Assert repo cloned 
+  assert:
+    that: 
+      - git_repo_status.stat.exists
+      - git_repo_status.stat.isdir
+    fail_msg: "Git repo was not cloned"
+    success_msg: "Git repo cloned successfully"
+
+
+- name: Install backend dependencies
+  command: pip3 install -r requirements.txt
+  args:
+    chdir: /home/vagrant/flask-postgresql-project/backend
+  register: requirement_installation_status
+  failed_when: requirement_installation_status.rc != 0
+  changed_when: requirement_installation_status.rc == 0
+
+
+- name: Assert backend dependencies installed
+  assert:
+    that: "requirement_installation_status.rc == 0"
+    fail_msg: "Required all backend dependencies not installed"
+    success_msg: "All required backend dependencies installed"
+
+
+- name: Print backend dependencies install failure status 
+  debug:
+    msg: "Failure Status: {{ requirement_installation_status.stderr }}"
+  when: requirement_installation_status.rc != 0
+
+
+- name: Prepare backend environment file
+  copy:
+    dest: /home/vagrant/flask-postgresql-project/backend/.env
+    content: |
+      APP_SETTINGS={{ backend_env_app_setting }}
+      DATABASE_URL={{ backend_env_db_url }}
+      API_HOST={{ ansible_host }}
+      API_PORT={{ backend_env_api_port }}
+    mode: '0644'
+
+
+- name: Start the backend
+  shell: |
+    nohup ~/.local/bin/gunicorn --chdir backend --bind 0.0.0.0:{{ backend_env_api_port }} app:app > backend/backend.log 2>&1 &
+    echo $!
+  args:
+    chdir: /home/vagrant/flask-postgresql-project/
+  register: backend_status
+
+
+- name: Show backend process PID 
+  debug:
+    msg: "Backend process PID : {{ backend_status.stdout | trim }}"
+
+
+- name: Verify backend port accessable
+  wait_for: 
+    host: 127.0.0.1
+    port: "{{ backend_env_api_port }}"
+    timeout: 20
+
+
+- name: Start the frontend
+  shell: | 
+    nohup python -m http.server {{ frontend_api_port }} --directory frontend > frontend/frontend.log 2>&1 &
+    echo $!
+  args:
+    chdir: /home/vagrant/flask-postgresql-project/
+  register: frontend_status
+
+
+- name: Show frontend process PID 
+  debug:
+    msg: "frontend process PID : {{ frontend_status.stdout | trim }}"
+
+
+- name: Verify frontend port accessable
+  wait_for: 
+    host: "{{ ansible_host }}"
+    port: "{{ frontend_api_port }}"
+    timeout: 20
