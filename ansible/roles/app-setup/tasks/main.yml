@@ -89,6 +89,22 @@
   run_once: true
 
 
+- name: check if migration scripts exists
+  find:
+    paths: /home/vagrant/flask-postgresql-project/backend/migrations/versions
+    pattters: "*.py"
+  register: migration_scripts
+
+
+- name: Generate one time initial migration
+  become: false
+  become_user: vagrant
+  command: python3 manage.py db migrate -m "initial migration"
+  args:
+    chdir: /home/vagrant/flask-postgresql-project/backend
+  when: migration_scripts.matched == 0
+  run_once: true
+
 - name: Apply one time database migration 
   become: false
   become_user: vagrant
