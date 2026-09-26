@@ -168,6 +168,22 @@
     success_msg: "Password for {{ db_user_name }} confirmed SCRAM-encrypted"
 
 
+- name: Ensure firewalld is running
+  systemd:
+    name: firewalld 
+    state: started 
+    enabled: true 
+
+
+- name: Allow application servers in firewall 
+  ansible.posix.firewalld:
+    rich_rule: 'rule family="ipv4" source address="{{ hostvars[item].ansible_host }}/32" port port="5432" protocol="tcp" accept'
+    permanent: true 
+    immediate: true 
+    state: enabled
+  loop: "{{ groups['app'] }}"
+
+
 
 
 

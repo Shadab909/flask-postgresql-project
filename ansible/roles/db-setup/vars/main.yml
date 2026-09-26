@@ -2,3 +2,4 @@ dependencies:
   - name: postgresql-server
   - name: postgresql
   - name: firewalld
+  - name: python3-firewall
