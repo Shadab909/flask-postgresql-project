@@ -38,6 +38,11 @@
   changed_when: requirement_installation_status.rc == 0
 
 
+- name: Print requirement installation status
+  debug:
+    var: requirement_installation_status
+
+
 - name: Assert backend dependencies installed
   assert:
     that: "requirement_installation_status.rc == 0"
