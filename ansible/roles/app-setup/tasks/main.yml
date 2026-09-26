@@ -100,8 +100,9 @@
   command: python3 manage.py db migrate -m "initial migration"
   args:
     chdir: /home/vagrant/flask-postgresql-project/backend
-  when: migration_scripts.matched == 0
-  when: inventory_hostname == 'app01'
+  when:
+  - inventory_hostname == 'app01'
+  - migration_scripts.matched == 0
 
 - name: Apply one time database migration 
   become: false
@@ -113,6 +114,13 @@
   changed_when: "'Running upgrade' in db_upgrade_status.stdout"
   when: inventory_hostname == 'app01'
 
+
+
+- name: Check if backend is already running
+  shell: "pgrep -f '/home/vagrant/.local/bin/gunicorn.*--bind 0.0.0.0:{{ backend_env_api_port }}' || true"
+  register: backend_process
+  changed_when: false
+
 - name: Start the backend
   become: false
   become_user: vagrant
@@ -122,6 +130,7 @@
   args:
     chdir: /home/vagrant/flask-postgresql-project/
   register: backend_status
+  when: backend_process.stdout == ""
 
 
 - name: Show backend process status 
@@ -135,6 +144,10 @@
     port: "{{ backend_env_api_port }}"
     timeout: 20
 
+- name: Check if frontend is already running
+  shell: "pgrep -f 'python -m http.server {{ frontend_api_port }} --directory frontend' || true"
+  register: frontend_process
+  changed_when: false
 
 - name: Start the frontend
   become: false
@@ -145,6 +158,7 @@
   args:
     chdir: /home/vagrant/flask-postgresql-project/
   register: frontend_status
+  when: frontend_process.stdout == ""
 
 
 - name: Show frontend process 
