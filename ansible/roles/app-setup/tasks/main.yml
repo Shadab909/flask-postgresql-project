@@ -63,7 +63,7 @@
 
 - name: Start the backend
   shell: |
-    nohup ~/.local/bin/gunicorn --chdir backend --bind 0.0.0.0:{{ backend_env_api_port }} app:app > backend/backend.log 2>&1 &
+    nohup gunicorn --chdir backend --bind 0.0.0.0:{{ backend_env_api_port }} app:app > backend/backend.log 2>&1 &
     echo $!
   args:
     chdir: /home/vagrant/flask-postgresql-project/
