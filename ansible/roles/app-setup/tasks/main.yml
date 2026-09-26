@@ -71,6 +71,20 @@
     mode: '0644'
 
 
+#debug
+- name: Debug - who and what PATH
+  shell: |
+    echo "Running as: $(whoami)"
+    echo "PATH is: $PATH"
+    echo "gunicorn location: $(which gunicorn || echo NOT FOUND)"
+  environment:
+    PATH: "/root/.local/bin:{{ ansible_env.PATH }}"
+  register: debug_output
+
+- debug:
+    var: debug_output.stdout_lines
+
+
 - name: Start the backend
   shell: |
     nohup gunicorn --chdir backend --bind 0.0.0.0:{{ backend_env_api_port }} app:app > backend/backend.log 2>&1 &
