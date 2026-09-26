@@ -76,9 +76,7 @@
   shell: |
     echo "Running as: $(whoami)"
     echo "PATH is: $PATH"
-    echo "gunicorn location: $(which gunicorn || echo NOT FOUND)"
-  environment:
-    PATH: "/root/.local/bin:{{ ansible_env.PATH }}"
+    echo "gunicorn location: $(which /root/.local/bin/gunicorn || echo NOT FOUND)"
   register: debug_output
 
 - debug:
@@ -86,8 +84,9 @@
 
 
 - name: Start the backend
+  become: true
   shell: |
-    nohup gunicorn --chdir backend --bind 0.0.0.0:{{ backend_env_api_port }} app:app > backend/backend.log 2>&1 &
+    nohup /root/.local/bin/gunicorn --chdir backend --bind 0.0.0.0:{{ backend_env_api_port }} app:app > backend/backend.log 2>&1 &
     echo $!
   args:
     chdir: /home/vagrant/flask-postgresql-project/
