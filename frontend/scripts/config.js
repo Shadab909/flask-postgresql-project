@@ -4,4 +4,5 @@
 
 const API_HOST = window.API_HOST || window.location.hostname || 'localhost';
 const API_PORT = window.API_PORT || '5000';
-const API_BASE_URL = `http://${API_HOST}:${API_PORT}/api/v1`;
+// const API_BASE_URL = `http://${API_HOST}:${API_PORT}/api/v1`;
+const API_BASE_URL = '/api/v1';
