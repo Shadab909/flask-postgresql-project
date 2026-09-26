@@ -34,6 +34,7 @@
 
 - name: Install backend dependencies
   become: false
+  become_user: vagrant
   command: pip3 install --user -r requirements.txt
   args:
     chdir: /home/vagrant/flask-postgresql-project/backend
