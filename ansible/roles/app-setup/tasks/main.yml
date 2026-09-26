@@ -90,7 +90,7 @@
 - name: check if migration scripts exists
   find:
     paths: /home/vagrant/flask-postgresql-project/backend/migrations/versions
-    pattters: "*.py"
+    patterns: "*.py"
   register: migration_scripts
 
 
