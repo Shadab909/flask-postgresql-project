@@ -62,11 +62,15 @@
 
 
 - name: Start the backend
+  become: true
+  become_user: vagrant
   shell: |
     nohup gunicorn --chdir backend --bind 0.0.0.0:{{ backend_env_api_port }} app:app > backend/backend.log 2>&1 &
     echo $!
   args:
     chdir: /home/vagrant/flask-postgresql-project/
+  environment:
+    PATH: "/home/vagrant/.local/bin:{{ ansible_env.PATH }}"
   register: backend_status
 
 
@@ -83,6 +87,8 @@
 
 
 - name: Start the frontend
+  become: true
+  become_user: vagrant
   shell: | 
     nohup python -m http.server {{ frontend_api_port }} --directory frontend > frontend/frontend.log 2>&1 &
     echo $!
@@ -91,9 +97,9 @@
   register: frontend_status
 
 
-- name: Show frontend process PID 
+- name: Show frontend process 
   debug:
-    msg: "frontend process PID : {{ frontend_status.stdout | trim }}"
+    msg: "frontend process : {{ frontend_status }}"
 
 
 - name: Verify frontend port accessable
