@@ -71,17 +71,33 @@
     mode: '0644'
 
 
-#debug
-- name: Debug - who and what PATH
-  shell: |
-    echo "Running as: $(whoami)"
-    echo "PATH is: $PATH"
-    echo "gunicorn location: $(which /root/.local/bin/gunicorn || echo NOT FOUND)"
-  register: debug_output
+- name: Ensure project directory is owned by vagrant
+  file:
+    path: /home/vagrant/flask-postgresql-project
+    owner: vagrant
+    group: vagrant
+    recurse: true
 
-- debug:
-    var: debug_output.stdout_lines
 
+- name: Initialize one time migration
+  become: false
+  become_user: vagrant
+  command: python3 manage.py db init
+  args:
+    chdir: /home/vagrant/flask-postgresql-project/backend
+    creates: /home/vagrant/flask-postgresql-project/backend/migrations
+  run_once: true
+
+
+- name: Apply one time database migration 
+  become: false
+  become_user: vagrant
+  command: python3 manage.py db upgrade
+  args:
+    chdir: /home/vagrant/flask-postgresql-project/backend
+  register: db_upgrade_status
+  changed_when: "'Running upgrade' in db_upgrade_status.stdout"
+  run_once: true
 
 - name: Start the backend
   become: true
@@ -112,8 +128,6 @@
     echo $!
   args:
     chdir: /home/vagrant/flask-postgresql-project/
-  environment:
-    PATH: "/root/.local/bin:{{ ansible_env.PATH }}"
   register: frontend_status
 
 
@@ -127,3 +141,11 @@
     host: "{{ ansible_host }}"
     port: "{{ frontend_api_port }}"
     timeout: 20
+
+
+- name: Ensure project directory is owned by vagrant
+  file:
+    path: /home/vagrant/flask-postgresql-project
+    owner: vagrant
+    group: vagrant
+    recurse: true
