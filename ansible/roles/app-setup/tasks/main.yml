@@ -70,9 +70,9 @@
   register: backend_status
 
 
-- name: Show backend process PID 
+- name: Show backend process status 
   debug:
-    msg: "Backend process PID : {{ backend_status.stdout | trim }}"
+    msg: "Backend process : {{ backend_status }}"
 
 
 - name: Verify backend port accessable
