@@ -110,11 +110,11 @@
   lineinfile:
     path: /var/lib/pgsql/data/postgresql.conf
     regexp: "^#?listen_addresses\\s*="
-    line: "listen_addresses = '{{ db_node_ip }}'          # what IP address(es) to listen on;"
+    line: "listen_addresses = '{{ hostvars['db01'].ansible_host }}'          # what IP address(es) to listen on;"
   notify: restart postgresql
 
 - name: Check if listen_addresses Update
-  command: grep "listen_addresses = '{{ db_node_ip }}'" /var/lib/pgsql/data/postgresql.conf
+  command: grep "listen_addresses = '{{ hostvars['db01'].ansible_host }}'" /var/lib/pgsql/data/postgresql.conf
   register: listen_addresses_validation_status
   changed_when: false 
 
@@ -122,8 +122,8 @@
 - name: Assert listen_addresses updated
   assert:
     that: "listen_addresses_validation_status.rc == 0"
-    fail_msg: "listen_addresses not updated to {{ db_node_ip }}"
-    success_msg: "listen_addresses updated to {{ db_node_ip }} confirmed"
+    fail_msg: "listen_addresses not updated to {{ hostvars['db01'].ansible_host }}"
+    success_msg: "listen_addresses updated to {{ hostvars['db01'].ansible_host }} confirmed"
 
  
 - name: Add pg_hpa entries for app servers
@@ -131,8 +131,8 @@
     path: /var/lib/pgsql/data/pg_hba.conf
     marker: "# {mark} ANSIBLE MANAGED BLOCK - For {{ db_name }} db access to app servers"
     block: |
-      host    infomarket    infomarket    {{ app01_node_ip }}/32    scram-sha-256
-      host    infomarket    infomarket    {{ app02_node_ip }}/32    scram-sha-256
+      host    infomarket    infomarket    {{ hostvars['app01'].ansible_host }}/32    scram-sha-256
+      host    infomarket    infomarket    {{ hostvars['app02'].ansible_host }}/32    scram-sha-256
 
 
 - name: Update password encryption type to SCRAM
