@@ -116,9 +116,10 @@
 
 
 
-- name: Check if backend is already running
-  shell: "pgrep -f '/home/vagrant/.local/bin/gunicorn.*--bind 0.0.0.0:{{ backend_env_api_port }}' || true"
-  register: backend_process
+- name: Check if backend port is already in use
+  shell: "ss -ltn | grep -q ':{{ backend_env_api_port }} '"
+  register: backend_port_check
+  failed_when: false
   changed_when: false
 
 - name: Start the backend
@@ -130,7 +131,7 @@
   args:
     chdir: /home/vagrant/flask-postgresql-project/
   register: backend_status
-  when: backend_process.stdout == ""
+  when: backend_port_check.rc != 0
 
 
 - name: Show backend process status 
@@ -144,10 +145,13 @@
     port: "{{ backend_env_api_port }}"
     timeout: 20
 
-- name: Check if frontend is already running
-  shell: "pgrep -f 'python -m http.server {{ frontend_api_port }} --directory frontend' || true"
-  register: frontend_process
+
+- name: Check if frontend port is already in use
+  shell: "ss -ltn | grep -q ':{{ frontend_api_port }} '"
+  register: frontend_port_check
+  failed_when: false
   changed_when: false
+  
 
 - name: Start the frontend
   become: false
@@ -158,7 +162,7 @@
   args:
     chdir: /home/vagrant/flask-postgresql-project/
   register: frontend_status
-  when: frontend_process.stdout == ""
+  when: frontend_port_check.rc != 0
 
 
 - name: Show frontend process 
