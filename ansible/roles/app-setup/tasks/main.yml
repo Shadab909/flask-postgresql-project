@@ -83,7 +83,7 @@
   args:
     chdir: /home/vagrant/flask-postgresql-project/backend
     creates: /home/vagrant/flask-postgresql-project/backend/migrations
-  run_once: true
+  when: inventory_hostname == 'app01'
 
 
 - name: check if migration scripts exists
@@ -91,6 +91,7 @@
     paths: /home/vagrant/flask-postgresql-project/backend/migrations/versions
     patterns: "*.py"
   register: migration_scripts
+  when: inventory_hostname == 'app01'
 
 
 - name: Generate one time initial migration
@@ -100,7 +101,7 @@
   args:
     chdir: /home/vagrant/flask-postgresql-project/backend
   when: migration_scripts.matched == 0
-  run_once: true
+  when: inventory_hostname == 'app01'
 
 - name: Apply one time database migration 
   become: false
@@ -110,7 +111,7 @@
     chdir: /home/vagrant/flask-postgresql-project/backend
   register: db_upgrade_status
   changed_when: "'Running upgrade' in db_upgrade_status.stdout"
-  run_once: true
+  when: inventory_hostname == 'app01'
 
 - name: Start the backend
   become: false
