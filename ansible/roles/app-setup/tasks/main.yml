@@ -58,7 +58,7 @@
       DATABASE_URL={{ backend_env_db_url }}
       API_HOST={{ ansible_host }}
       API_PORT={{ backend_env_api_port }}
-    onwner: vagrant
+    owner: vagrant
     group: vagrant
     mode: '0644'
 
