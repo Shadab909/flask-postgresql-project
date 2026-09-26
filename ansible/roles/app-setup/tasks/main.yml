@@ -29,7 +29,7 @@
 
 
 - name: Install backend dependencies
-  command: pip3 install -r requirements.txt
+  command: pip3 install --user -r requirements.txt
   args:
     chdir: /home/vagrant/flask-postgresql-project/backend
   register: requirement_installation_status
@@ -58,12 +58,13 @@
       DATABASE_URL={{ backend_env_db_url }}
       API_HOST={{ ansible_host }}
       API_PORT={{ backend_env_api_port }}
+    onwner: vagrant
+    group: vagrant
     mode: '0644'
 
 
 - name: Start the backend
-  become: true
-  become_user: vagrant
+  become: false
   shell: |
     nohup gunicorn --chdir backend --bind 0.0.0.0:{{ backend_env_api_port }} app:app > backend/backend.log 2>&1 &
     echo $!
@@ -87,7 +88,7 @@
 
 
 - name: Start the frontend
-  become: true
+  become: false
   become_user: vagrant
   shell: | 
     nohup python -m http.server {{ frontend_api_port }} --directory frontend > frontend/frontend.log 2>&1 &
