@@ -76,6 +76,7 @@
 
 - name: Start the backend
   become: false
+  become_user: vagrant
   shell: |
     nohup gunicorn --chdir backend --bind 0.0.0.0:{{ backend_env_api_port }} app:app > backend/backend.log 2>&1 &
     echo $!
