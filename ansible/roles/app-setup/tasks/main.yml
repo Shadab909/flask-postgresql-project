@@ -71,17 +71,15 @@
     mode: '0644'
 
 
-- name: Ensure project directory is owned by vagrant
-  file:
-    path: /home/vagrant/flask-postgresql-project
-    owner: vagrant
-    group: vagrant
-    recurse: true
+# - name: Ensure project directory is owned by vagrant
+#   file:
+#     path: /home/vagrant/flask-postgresql-project
+#     owner: vagrant
+#     group: vagrant
+#     recurse: true
 
 
 - name: Initialize one time migration
-  become: false
-  become_user: vagrant
   command: python3 manage.py db init
   args:
     chdir: /home/vagrant/flask-postgresql-project/backend
@@ -97,8 +95,6 @@
 
 
 - name: Generate one time initial migration
-  become: false
-  become_user: vagrant
   command: python3 manage.py db migrate -m "initial migration"
   args:
     chdir: /home/vagrant/flask-postgresql-project/backend
@@ -106,8 +102,6 @@
   run_once: true
 
 - name: Apply one time database migration 
-  become: false
-  become_user: vagrant
   command: python3 manage.py db upgrade
   args:
     chdir: /home/vagrant/flask-postgresql-project/backend
@@ -159,9 +153,14 @@
     timeout: 20
 
 
-- name: Ensure project directory is owned by vagrant
-  file:
-    path: /home/vagrant/flask-postgresql-project
-    owner: vagrant
-    group: vagrant
-    recurse: true
+# - name: Ensure project directory is owned by vagrant
+#   file:
+#     path: /home/vagrant/flask-postgresql-project
+#     owner: vagrant
+#     group: vagrant
+#     recurse: true- name: Ensure project directory is owned by vagrant
+#   file:
+#     path: /home/vagrant/flask-postgresql-project
+#     owner: vagrant
+#     group: vagrant
+#     recurse: true
