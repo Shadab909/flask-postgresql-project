@@ -1,0 +1,3 @@
+# group_vars/db/vars.yml (plaintext, references the vault dict)
+ansible_password: "{{ lb_passwords[inventory_hostname] }}"
+ansible_become_password: "{{ lb_passwords[inventory_hostname] }}"

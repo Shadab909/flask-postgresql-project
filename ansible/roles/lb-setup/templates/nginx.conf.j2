@@ -1,0 +1,40 @@
+events {}
+
+http {
+	upstream frontend_backend {
+        	least_conn;
+{% for host in groups['app'] %}
+            server {{ hostvars[host].ansible_host }}:{{ frontend_api_port }};
+{% endfor %}
+    	}
+
+	upstream flask_backend {
+    		least_conn;
+{% for host in groups['app'] %}
+        server {{ groupvars[host].ansible_host }}:{{ backend_env_api_port }}
+{% endfor %}
+	}
+
+    	server {
+        	listen {{ lb_listen_port }};
+        	server_name _;
+
+		location /api/ {
+           	 	proxy_pass http://flask_backend;
+
+            		proxy_set_header Host $host;
+            		proxy_set_header X-Real-IP $remote_addr;
+            		proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            		proxy_set_header X-Forwarded-Proto $scheme;
+        	}
+
+        	location / {
+            		proxy_pass http://frontend_backend;
+
+            		proxy_set_header Host $host;
+            		proxy_set_header X-Real-IP $remote_addr;
+            		proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            		proxy_set_header X-Forwarded-Proto $scheme;
+        	}
+    	}
+}

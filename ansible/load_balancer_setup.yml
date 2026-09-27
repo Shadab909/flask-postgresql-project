@@ -1,0 +1,11 @@
+---
+- name: LB setup 
+  hosts: lb 
+  become: true 
+  gather_facts: false 
+
+  vars_files:
+    - vars_files/secrets.yml 
+  
+  roles:
+    - lb-setup
