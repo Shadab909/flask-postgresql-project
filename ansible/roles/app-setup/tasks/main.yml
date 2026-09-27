@@ -17,6 +17,7 @@
   git: 
     repo: "{{ git_repo_url }}"
     dest: /home/vagrant/flask-postgresql-project
+    force: true
 
 
 - name: Check if git repo cloned 
