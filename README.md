@@ -1,8 +1,8 @@
-# Self-Healing Multi-Tier Deployment — InfoMarket Challenge
+# Self-Healing Multi-Tier Deployment
 
-This repository extends the original [InfoMarket CRUD challenge](https://infomarketpesquisa.com/) — a Flask + PostgreSQL user/address management application — with a fully automated, self-healing multi-tier infrastructure built using **Ansible** and **AWX**.
+A Flask + PostgreSQL user/address management application — with a fully automated, self-healing multi-tier infrastructure built using **Ansible** and **AWX**.
 
-What's new here is the **deployment and operations layer**: a set of Ansible roles that provision, configure, and keep the application running across a 4-node lab environment, orchestrated through AWX.
+What's implemented here is the **deployment and operations layer**: a set of Ansible roles that provision, configure, and keep the application running across a 4-node lab environment, orchestrated through AWX.
 
 ## Architecture
 
