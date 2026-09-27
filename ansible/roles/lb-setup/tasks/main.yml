@@ -18,6 +18,7 @@
     dest: /etc/nginx/nginx.conf_bak
     remote_src: true
     mode: '0644'
+    force: false
 
 
 - name: Deploy ngnix config from templates
