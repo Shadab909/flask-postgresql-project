@@ -4,5 +4,6 @@ dependencies:
   - name: python3-devel 
   - name: postgresql-devel 
   - name: postgresql
+  - name: policycoreutils-python-utils
 
 git_repo_url: 'https://github.com/Shadab909/flask-postgresql-project.git'

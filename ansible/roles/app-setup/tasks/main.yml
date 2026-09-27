@@ -1,9 +1,4 @@
 ---
-
-- name: Show effective connection user
-  debug:
-    msg: "Connecting as: {{ ansible_user }}"
-
 - name: Install dependencies
   package:
     name: "{{ item.name }}"
@@ -64,6 +59,16 @@
   when: requirement_installation_status.rc != 0
 
 
+- name: Set SELinux context for gunicorn binary
+  sefcontext:
+    target: /home/vagrant/.local/bin/gunicorn
+    setype: bin_t
+
+
+- name: Restore SELinux context 
+  command: restorecon -v /home/vagrant/.local/bin/gunicorn
+
+
 - name: Prepare backend environment file
   copy:
     dest: /home/vagrant/flask-postgresql-project/backend/.env
@@ -104,6 +109,7 @@
   when:
   - inventory_hostname == 'app01'
   - migration_scripts.matched == 0
+
 
 - name: Apply one time database migration 
   become: false
