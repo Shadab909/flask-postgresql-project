@@ -11,7 +11,7 @@ http {
 	upstream flask_backend {
     		least_conn;
 {% for host in groups['app'] %}
-        server {{ hostvars[host].ansible_host }}:{{ backend_env_api_port }}
+        server {{ hostvars[host].ansible_host }}:{{ backend_env_api_port }};
 {% endfor %}
 	}
 
