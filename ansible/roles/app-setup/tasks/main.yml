@@ -115,63 +115,42 @@
   when: inventory_hostname == 'app01'
 
 
-
-- name: Check if backend port is already in use
-  shell: "ss -ltn | grep -q ':{{ backend_env_api_port }} '"
-  register: backend_port_check
-  failed_when: false
-  changed_when: false
-
-- name: Start the backend
-  become: false
-  become_user: vagrant
-  shell: |
-    nohup /home/vagrant/.local/bin/gunicorn --chdir backend --bind 0.0.0.0:{{ backend_env_api_port }} app:app > backend/backend.log 2>&1 &
-    echo $!
-  args:
-    chdir: /home/vagrant/flask-postgresql-project/
-  register: backend_status
-  when: backend_port_check.rc != 0
+- name: Deploy the backend systemd service file 
+  template:
+    src: flask_backend.service.j2
+    dest: /etc/systemd/system/flask_backend.service
+  notify: reload daemon
 
 
-- name: Show backend process status 
-  debug:
-    msg: "Backend process : {{ backend_status }}"
-
+- name: Start and enable backend service 
+  systemd:
+    name: flask_backend
+    state: started 
+    enabled: true 
 
 - name: Verify backend port accessable
   wait_for: 
     host: 127.0.0.1
     port: "{{ backend_env_api_port }}"
-    timeout: 20
+    timeout: 10
 
 
-- name: Check if frontend port is already in use
-  shell: "ss -ltn | grep -q ':{{ frontend_api_port }} '"
-  register: frontend_port_check
-  failed_when: false
-  changed_when: false
-  
-
-- name: Start the frontend
-  become: false
-  become_user: vagrant
-  shell: | 
-    nohup python -m http.server {{ frontend_api_port }} --directory frontend > frontend/frontend.log 2>&1 &
-    echo $!
-  args:
-    chdir: /home/vagrant/flask-postgresql-project/
-  register: frontend_status
-  when: frontend_port_check.rc != 0
+- name: Deploy the frontend systemd service file 
+  template:
+    src: flask_frontend.service.j2
+    dest: /etc/systemd/system/flask_frontend.service
+  notify: reload daemon
 
 
-- name: Show frontend process 
-  debug:
-    msg: "frontend process : {{ frontend_status }}"
+- name: Start and enable frontend service 
+  systemd:
+    name: flask_frontend
+    state: started 
+    enabled: true 
 
 
 - name: Verify frontend port accessable
   wait_for: 
     host: "{{ ansible_host }}"
     port: "{{ frontend_api_port }}"
-    timeout: 20
+    timeout: 10

@@ -1,0 +1,24 @@
+[Unit]
+Description=Flask Postgres Application Backend Service
+After=network.target
+Wants=network-online.target
+
+
+[Service]
+Type=simple
+User=vagrant
+Group=vagrant
+WorkingDirectory=/home/vagrant/flask-postgresql-project
+ExecStart=/home/vagrant/.local/bin/gunicorn --chdir backend --bind 0.0.0.0:{{ backend_env_api_port }} app:app
+Restart=on-failure
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+
+NoNewPrivileges=true
+ProtectSystem=true
+PrivateTmp=true 
+
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,24 @@
+[Unit]
+Description=Flask Postgres Application Frontend Service
+After=network.target
+Wants=network-online.target
+
+
+[Service]
+Type=simple
+User=vagrant
+Group=vagrant
+WorkingDirectory=/home/vagrant/flask-postgresql-project
+ExecStart=python3 -m http.server {{  frontend_api_port }} --directory frontend
+Restart=on-failure
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+
+NoNewPrivileges=true
+ProtectSystem=true
+PrivateTmp=true 
+
+
+[Install]
+WantedBy=multi-user.target
