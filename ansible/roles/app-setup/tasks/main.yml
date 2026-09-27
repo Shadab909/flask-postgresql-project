@@ -123,6 +123,10 @@
   notify: reload daemon
 
 
+- name: Flush handlers to apply reload daemon immediately
+  meta: flush_handlers
+
+
 - name: Start and enable backend service 
   systemd:
     name: flask_backend
@@ -141,6 +145,10 @@
     src: flask_frontend.service.j2
     dest: /etc/systemd/system/flask_frontend.service
   notify: reload daemon
+
+
+- name: Flush handlers to apply reload daemon immediately
+  meta: flush_handlers
 
 
 - name: Start and enable frontend service 
