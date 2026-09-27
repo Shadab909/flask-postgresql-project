@@ -59,10 +59,16 @@
   when: requirement_installation_status.rc != 0
 
 
+# - name: Set SELinux context for gunicorn binary
+#   sefcontext:
+#     target: /home/vagrant/.local/bin/gunicorn
+#     setype: bin_t
+
 - name: Set SELinux context for gunicorn binary
-  sefcontext:
-    target: /home/vagrant/.local/bin/gunicorn
-    setype: bin_t
+  command: semanage fcontext -a -t bin_t "/home/vagrant/.local/bin/gunicorn"
+  register: semanage_status
+  failed_when: semanage_status.rc != 0 and 'already defined' not in semanage_status.stderr
+  changed_when: semanage_status.rc == 0
 
 
 - name: Restore SELinux context 
